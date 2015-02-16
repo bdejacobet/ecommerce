@@ -87,10 +87,14 @@ class AddressType extends AbstractType
         $builder->add('name', null, array('required' => !count($addresses)));
 
         if (isset($options['types'])) {
-            $builder->add('type', 'choice', array(
-                    'choices' => $options['types'],
-                    'translation_domain' => 'SonataCustomerBundle')
-            );
+            if (count($options['types']) == 1) {
+                $builder->add('type', 'hidden', array('data' => array_shift($options['types'])));
+            } else {
+                $builder->add('type', 'choice', array(
+                        'choices' => $options['types'],
+                        'translation_domain' => 'SonataCustomerBundle')
+                );
+            }
         }
 
         $builder
@@ -146,7 +150,8 @@ class AddressType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class'  => $this->addressClass,
-            'addresses'   => array()
+            'addresses'   => array(),
+            'types'       => array()
         ));
     }
 

@@ -330,7 +330,7 @@ class BasketController extends Controller
         $addresses = $customer->getAddressesByType(AddressInterface::TYPE_DELIVERY);
 
         // Show address creation / selection form
-        $form = $this->createForm('sonata_basket_address', null, array('addresses' => $addresses));
+        $form = $this->createForm('sonata_basket_address', null, array('addresses' => $addresses, 'types' => array(AddressInterface::TYPE_DELIVERY)));
         $template = 'SonataBasketBundle:Basket:delivery_address_step.html.twig';
 
         if ($this->get('request')->getMethod() == 'POST') {
@@ -341,7 +341,6 @@ class BasketController extends Controller
                     $address = $form->get('addresses')->getData();
                 } else {
                     $address = $form->getData();
-                    $address->setType(AddressInterface::TYPE_DELIVERY);
 
                     $customer->addAddress($address);
 
@@ -394,7 +393,7 @@ class BasketController extends Controller
         $addresses = $customer->getAddressesByType(AddressInterface::TYPE_BILLING);
 
         // Show address creation / selection form
-        $form = $this->createForm('sonata_basket_address', null, array('addresses' => $addresses->toArray()));
+        $form = $this->createForm('sonata_basket_address', null, array('addresses' => $addresses, 'types' => array(AddressInterface::TYPE_BILLING)));
         $template = 'SonataBasketBundle:Basket:payment_address_step.html.twig';
 
         if ($this->get('request')->getMethod() == 'POST') {
@@ -405,7 +404,6 @@ class BasketController extends Controller
                     $address = $form->get('addresses')->getData();
                 } else {
                     $address = $form->getData();
-                    $address->setType(AddressInterface::TYPE_BILLING);
 
                     $customer->addAddress($address);
 
