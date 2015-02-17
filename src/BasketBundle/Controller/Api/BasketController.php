@@ -31,6 +31,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * Class BasketController
@@ -282,7 +283,13 @@ class BasketController
         $form->bind($request);
 
         if ($form->isValid()) {
+
             $basket = $form->getData();
+
+            if ($basket->getCustomerId()) {
+                $this->checkExistingCustomerBasket($basket->getCustomerId());
+            }
+
             $this->basketManager->save($basket);
 
             $view = \FOS\RestBundle\View\View::create($basket);
@@ -517,5 +524,22 @@ class BasketController
         }
 
         return $product;
+    }
+
+    /**
+     * Throws an exception if it already exists a basket with a specific customer id
+     *
+     * @param $customerId
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    protected function checkExistingCustomerBasket($customerId)
+    {
+        $basket = $this->basketManager->findOneBy(array('customer' => $customerId));
+
+        if ($basket instanceof BasketInterface) {
+            throw new HttpException('400', sprintf('Customer (%d) already has a basket', $customerId));
+        }
+
     }
 }
